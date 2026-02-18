@@ -1,8 +1,12 @@
 @import "tailwindcss";
-
 @plugin "tailwindcss-animate";
-
 @custom-variant dark (&:is(.dark *));
+
+
+input::placeholder, img{
+    user-select: none;
+}
+
 
 @theme inline {
     --radius-sm: calc(var(--radius) - 4px);

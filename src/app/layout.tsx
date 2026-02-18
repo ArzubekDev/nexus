@@ -32,22 +32,14 @@ export default function RootLayout({
       >
        <ThemeProvider
             attribute="class"
-            defaultTheme="dark" // Демейки тема
+            defaultTheme="dark"
             enableSystem
             disableTransitionOnChange
           >
-
-         <div className="flex h-screen w-full overflow-hidden bg-white dark:bg-[#0f0f13]">
-            
-            <MiniSidebar />
-
-            <ChatList />
-
             <main className="flex-1 h-full overflow-hidden relative">
               {children}
             </main>
 
-          </div>
           </ThemeProvider>
       </body>
     </html>

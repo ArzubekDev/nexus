@@ -6,7 +6,7 @@ export default function EmptyPage() {
       <div className="flex items-center justify-center">
         <Image src={"/logo.png"} alt="Nexus" width={200} height={40} />
       </div>
-      <p className="text-gray-500">Выберите чат, чтобы начать общение</p>
+      <p className="text-gray-500 select-none">Выберите чат, чтобы начать общение</p>
     </div>
   );
 }

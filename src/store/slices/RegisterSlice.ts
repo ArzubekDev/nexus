@@ -38,7 +38,7 @@ registerUser: async (data) => {
     const res = await axios.post(`${API_URL}/register`, data);
 
     // Cookie сактоо
-    Cookies.set("auth_token", res.data.access_token, { expires: 7 });
+    Cookies.set("auth_token", res.data.accessToken, { expires: 7 });
 
     // user сактоо store'го
     set({

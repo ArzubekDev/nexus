@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { Inter, Montserrat } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
-import MiniSidebar from "@/components/MiniSidebar";
-import ChatList from "@/components/ChatList";
+import { ToastContainer } from "react-toastify";
+
 
 const inter = Inter({
   subsets: ["latin"],
@@ -18,6 +18,10 @@ const montserrat = Montserrat({
 export const metadata: Metadata = {
   title: "Nexus Chat",
   description: "Real-time futuristic chat application",
+  icons: {
+    icon: "/logo.png", 
+    apple: "/logo.png", 
+  },
 };
 
 export default function RootLayout({
@@ -36,9 +40,10 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <main className="flex-1 h-full overflow-hidden relative">
+        <ToastContainer />
+
               {children}
-            </main>
+
 
           </ThemeProvider>
       </body>

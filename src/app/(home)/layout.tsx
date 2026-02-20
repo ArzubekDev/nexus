@@ -1,3 +1,5 @@
+"use client";
+
 import ChatList from "@/components/ChatList";
 import MiniSidebar from "@/components/MiniSidebar";
 import { FC, ReactNode } from "react";
@@ -8,17 +10,14 @@ interface LayoutProps {
 
 const Layout: FC<LayoutProps> = ({ children }) => {
   return (
-    <>
-      <div className="flex h-screen w-full overflow-hidden bg-white dark:bg-[#0f0f13]">
-        <MiniSidebar />
+    <div className="flex h-screen w-full overflow-hidden bg-white dark:bg-[#0f0f13]">
+      <MiniSidebar />
+      <ChatList />
 
-        <ChatList />
-
-        <main className="flex-1 h-full overflow-hidden relative">
-          {children}
-        </main>
-      </div>
-    </>
+      <main className="flex-1 h-full overflow-hidden relative">
+        {children}
+      </main>
+    </div>
   );
 };
 

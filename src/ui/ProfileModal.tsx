@@ -19,7 +19,7 @@ const ProfileModal = () => {
           <p className="text-sm font-semibold text-gray-800 dark:text-gray-200">
             {user?.email}
           </p>
-          <p className="text-xs text-gray-500">Аккаунт менюсу</p>
+          <p className="text-xs text-gray-500">Профиль</p>
         </div>
 
         <div className="flex flex-col mt-2 gap-1">
@@ -29,7 +29,7 @@ const ProfileModal = () => {
         hover:bg-gray-100 dark:hover:bg-[#2a2a35] 
         transition"
           >
-            Profile
+            Профиль
           </button>
 
           <button
@@ -38,7 +38,7 @@ const ProfileModal = () => {
         hover:bg-gray-100 dark:hover:bg-[#2a2a35] 
         transition"
           >
-            Settings
+            Настройка
           </button>
 
           <div className="h-px bg-gray-200 dark:bg-gray-700 my-2" />
@@ -50,7 +50,7 @@ const ProfileModal = () => {
         hover:bg-red-50 dark:hover:bg-red-900/20 
         transition font-medium"
           >
-            Logout
+            Выйти
           </button>
         </div>
       </ProfileProvider.Window>

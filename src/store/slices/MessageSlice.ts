@@ -33,41 +33,51 @@ export const createMessageSlice: StateCreator<MessageSlice> = (set, get) => ({
       });
       set({ messages: res.data });
     } catch (error) {
-      console.error(error);
+      console.error("Билдирүүлөрдү жүктөөдө ката:", error);
     }
   },
 
   connectSocket: (roomId) => {
-    const existing = get().socket;
-    if (existing) {
-      existing.disconnect();
+    if (get().socket) {
+      get().socket?.disconnect();
     }
 
     const token = Cookies.get("auth_token");
 
-    const socket = io(API_URL, {
-      auth: {
-        token: token,
-      },
-    });
-
-    socket.on("new-message", (message) => {
-      set((state) => ({
-        messages: [...state.messages, message],
-      }));
+    const socket = io(API_URL!, {
+      transports: ["websocket"], 
+      auth: { token },
+      reconnectionAttempts: 5,
     });
 
     socket.on("connect", () => {
-      console.log("Connected to Socket");
+      console.log("Сокетке туташты ✅");
       socket.emit("join-room", roomId);
     });
+
+    socket.off("new-message"); 
+    socket.on("new-message", (message: MessageProps) => {
+      set((state) => {
+        const exists = state.messages.some((m) => m.id === message.id);
+        if (exists) return state;
+        return { messages: [...state.messages, message] };
+      });
+    });
+
+    socket.on("disconnect", () => console.log("Сокет үзүлдү ❌"));
 
     set({ socket });
   },
 
   sendMessage: (roomId, text) => {
-    get().socket?.emit("send-message", { roomId, text });
+    const socket = get().socket;
+    if (socket && socket.connected) {
+      socket.emit("send-message", { roomId, text });
+    } else {
+      console.error("Сокет туташкан эмес!");
+    }
   },
+
   disconnectSocket: () => {
     get().socket?.disconnect();
     set({ socket: null });

@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { useStore } from "@/store/useStore"; 
+import { useStore } from "@/store/useStore";
 import {
   Phone,
   Video,
@@ -88,34 +88,47 @@ const Chat = () => {
               className={`flex items-start gap-4 max-w-lg ${isMe ? "ml-auto flex-row-reverse" : ""}`}
             >
               <img
-                src={isMe ? "https://github.com/shadcn.png" : "https://i.pravatar.cc/150?u=sasha"}
+                src={
+                  isMe
+                    ? "https://github.com/shadcn.png"
+                    : "https://i.pravatar.cc/150?u=sasha"
+                }
                 className="w-8 h-8 rounded-full shadow-sm"
                 alt="sender"
               />
               <div className={isMe ? "text-right" : ""}>
-                <div className={`flex items-center gap-2 mb-1 ${isMe ? "justify-end" : ""}`}>
-                  <span className={`text-sm font-bold ${isMe ? "text-purple-600 dark:text-purple-400" : "text-slate-700 dark:text-white"}`}>
+                <div
+                  className={`flex items-center gap-2 mb-1 ${isMe ? "justify-end" : ""}`}
+                >
+                  <span
+                    className={`text-sm font-bold ${isMe ? "text-purple-600 dark:text-purple-400" : "text-slate-700 dark:text-white"}`}
+                  >
                     {isMe ? "You" : "User"}
                   </span>
                   <span className="text-[10px] text-slate-400 dark:text-gray-500">
-                    {new Date(msg.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                    {new Date(msg.createdAt).toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
                   </span>
                 </div>
 
-                <div className={`p-4 rounded-2xl ${
+                <div
+                  className={`p-4 rounded-2xl max-w-[75%] md:max-w-lg w-fit wrap-break-word ${
                     isMe
-                      ? "bg-purple-600 text-white shadow-md rounded-tr-none"
-                      : "bg-white text-slate-700 border border-slate-100 shadow-sm dark:bg-[#4d38a2] dark:text-white rounded-tl-none"
+                      ? "bg-purple-600 text-white shadow-md rounded-tr-none ml-auto"
+                      : "bg-white text-slate-700 border border-slate-100 shadow-sm dark:bg-[#4d38a2] dark:text-white rounded-tl-none mr-auto"
                   }`}
                 >
-                  <p className="text-sm leading-relaxed">{msg.text}</p>
+                  <p className="text-sm leading-relaxed whitespace-pre-wrap">
+                    {msg.text}
+                  </p>
                 </div>
               </div>
             </div>
           );
         })}
-        {/* Скролл үчүн бош div */}
-        <div ref={messagesEndRef} /> 
+        <div ref={messagesEndRef} />
       </div>
 
       <footer className="p-6 bg-white dark:bg-[#0b0b0e] border-t border-slate-100">
@@ -143,7 +156,10 @@ const Chat = () => {
           />
 
           {text.trim() ? (
-            <button type="submit" className="p-3 bg-purple-600 rounded-xl text-white">
+            <button
+              type="submit"
+              className="p-3 bg-purple-600 rounded-xl text-white"
+            >
               <Send className="w-5 h-5" />
             </button>
           ) : (

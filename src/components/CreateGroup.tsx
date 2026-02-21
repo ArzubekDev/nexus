@@ -5,7 +5,7 @@ import { useRef, useState } from "react";
 import { toast } from "react-toastify";
 
 type CreateGroupProps = {
-  dispatch: React.Dispatch<{ type: "OPEN" | "CLOSE" }>;
+  dispatch: React.Dispatch<{ type: "OPEN_GROUP" | "CLOSE_GROUP" }>;
 };
 
 const CreateGroup = ({ dispatch }: CreateGroupProps) => {
@@ -24,28 +24,31 @@ const CreateGroup = ({ dispatch }: CreateGroupProps) => {
 
     if (result.success) {
       toast.success("Успешно!");
-      dispatch({ type: "CLOSE" });
+      dispatch({ type: "CLOSE_GROUP" });
     }
   };
 
   return (
     <motion.div
-      initial={{ opacity: 0, x: 100 }}
+      key="list"
+      initial={{ opacity: 0, x: -100 }}
       animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: -100 }}
+      transition={{ duration: 0.3 }}
       className="relative min-h-screen w-full flex items-start justify-center pt-16"
     >
-     <motion.button
-  onClick={() => dispatch({ type: "CLOSE" })}
-  className="absolute left-4 top-4 p-2.5 cursor-pointer
+      <motion.button
+        onClick={() => dispatch({ type: "CLOSE_GROUP" })}
+        className="absolute left-4 top-4 p-2.5 cursor-pointer
              bg-white dark:bg-gray-800 
              border border-slate-200 dark:border-gray-700
              hover:bg-slate-50 dark:hover:bg-gray-700 
              rounded-xl shadow-sm transition-colors group"
-  title="Назад"
-  aria-label="Назад к списку чатов"
->
-  <MoveLeft className="w-5 h-5 text-slate-600 dark:text-gray-300 group-hover:text-purple-500" />
-</motion.button>
+        title="Назад"
+        aria-label="Назад к списку чатов"
+      >
+        <MoveLeft className="w-5 h-5 text-slate-600 dark:text-gray-300 group-hover:text-purple-500" />
+      </motion.button>
       <div className="w-full rounded-2xl shadow-lg p-3 space-y-6">
         <div className="text-center">
           <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-200">

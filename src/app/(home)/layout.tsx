@@ -9,14 +9,12 @@ interface LayoutProps {
 }
 
 const Layout: FC<LayoutProps> = ({ children }) => {
+
   return (
     <div className="flex h-screen w-full overflow-hidden bg-white dark:bg-[#0f0f13]">
       <MiniSidebar />
       <ChatList />
-
-      <main className="flex-1 h-full overflow-hidden relative">
-        {children}
-      </main>
+      <main className="flex-1 h-full overflow-hidden relative">{children}</main>
     </div>
   );
 };

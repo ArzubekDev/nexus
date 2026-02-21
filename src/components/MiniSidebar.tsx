@@ -30,7 +30,7 @@ const MiniSidebar = () => {
   }, [user?.email]);
 
   return (
-    <aside className="w-20 h-screen flex flex-col items-center border-r border-gray-200 dark:border-gray-800 bg-[#f8faff] dark:bg-[#1a1a20] py-20">
+    <aside className="md:flex hidden w-20 h-screen flex-col items-center border-r border-gray-200 dark:border-gray-800 bg-[#f8faff] dark:bg-[#1a1a20] py-20">
       <div className="mb-8 relative">
         {user ? (
           <ProfileProvider>

@@ -1,8 +1,8 @@
-import Chat from '@/components/Chat';
+import Chat from "@/components/Chat";
 
-// Next.js page компоненти params'ты автоматтык түрдө алат
-const ChatID = ({ params }: { params: Promise<{ chatId: string }> }) => {
-  return <Chat params={params} />;
+
+const ChatID = () => {
+  return <Chat/>;
 };
 
 export default ChatID;

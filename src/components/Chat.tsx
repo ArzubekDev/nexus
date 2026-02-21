@@ -1,6 +1,6 @@
 "use client";
-import React, { use, useEffect, useState, useRef } from "react";
-import { useStore } from "@/store/useStore"; // Өзүңүздүн store жолун көрсөтүңүз
+import React, { use, useEffect, useState, useRef, useReducer } from "react";
+import { useStore } from "@/store/useStore"; 
 import {
   Phone,
   Video,
@@ -12,20 +12,26 @@ import {
 } from "lucide-react";
 import { ChatProvider } from "@/providers/ChatProvider";
 import ChatSettings from "@/ui/ChatSettings";
+import { useParams } from "next/navigation";
+import { useChat } from "@/modules/useChat";
 
-interface ChatProps {
-  params: Promise<{ chatId: string }>;
-}
 
-const Chat = ({ params }: ChatProps) => {
-  const { chatId } = use(params);
-  const [text, setText] = useState("");
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+const Chat = () => {
+  const params = useParams();
+const { chatId } = useParams() as { chatId: string };
+
+const {
+  text,
+  setText,
+  textareaRef,
+  messagesEndRef,
+  messages,
+  myUserId,
+  handleSendMessage,
+} = useChat(chatId);
 
   const {
     rooms,
-    messages,
     user,
     fetchMessages,
     connectSocket,
@@ -33,7 +39,6 @@ const Chat = ({ params }: ChatProps) => {
     disconnectSocket,
   } = useStore((s) => s);
 
-  const myUserId = user?.id;
 
   const currentChat = rooms.find((room) => room.id === chatId);
 
@@ -62,20 +67,11 @@ const Chat = ({ params }: ChatProps) => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const handleSendMessage = (e?: React.FormEvent) => {
-    e?.preventDefault();
-    if (!text.trim()) return;
-
-    if (text.trim() && myUserId) {
-      sendMessage(chatId, text, myUserId);
-      setText("");
-    }
-  };
 
   if (!currentChat)
     return <div className="flex-1 bg-white dark:bg-[#101014]" />;
   return (
-    <section className="flex-1 h-screen flex flex-col bg-white dark:bg-[#0b0b0e] text-slate-900 dark:text-white overflow-hidden transition-colors duration-300">
+    <section className="z-50 flex-1 h-screen flex flex-col bg-white dark:bg-[#0b0b0e] text-slate-900 dark:text-white overflow-hidden transition-colors duration-300">
       <header
         className="relative h-24 flex items-center justify-between px-8 
         bg-white border-b border-slate-100 
@@ -115,7 +111,7 @@ const Chat = ({ params }: ChatProps) => {
       </header>
 
       <div className="flex-1 overflow-y-auto p-8 space-y-8 bg-[#f8fafc] dark:bg-linear-to-b dark:from-[#1a1a2e] dark:to-[#0b0b0e] custom-scrollbar">
-        {messages.map((msg) => {
+        {messages.map((msg: any) => {
           const isMe = msg.senderId === myUserId;
 
           return (
@@ -161,10 +157,9 @@ const Chat = ({ params }: ChatProps) => {
             </div>
           );
         })}
-        <div ref={messagesEndRef} /> {/* Скролл үчүн */}
+        <div ref={messagesEndRef} /> 
       </div>
 
-      {/* --- INPUT AREA --- */}
       <footer className="p-6 bg-white dark:bg-[#0b0b0e] border-t border-slate-100 dark:border-none">
         <form
           onSubmit={handleSendMessage}

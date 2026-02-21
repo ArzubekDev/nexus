@@ -55,6 +55,8 @@ export const createRoomSlice: StateCreator<RoomSlice> = (set) => ({
   },
 
   fetchRooms: async () => {
+    const token = Cookies.get("auth_token");
+  console.log("Жөнөтүлүп жаткан токен:", token); 
     try {
       const res = await axios.get(`${API_URL}/rooms`, {
         headers: { Authorization: `Bearer ${Cookies.get("auth_token")}` },

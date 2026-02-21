@@ -5,30 +5,52 @@ import { useEffect, useReducer, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import CreateGroup from "./CreateGroup";
 import { useStore } from "@/store/useStore";
-import { usePathname, useRouter } from "next/navigation";
-import Link from "next/link";
 import animationData from "@/assets/lottie/menu.json";
+import animationDataDark from "@/assets/lottie/dark.json";
 import Lottie, { LottieRefCurrentProps } from "lottie-react";
-import Chat from "./Chat";
 import ChatListButton from "@/ui/ChatListButton";
 import ChatListMobileButton from "@/ui/ChatListMobileButton";
 import ChatMobile from "./ChatMobile";
+import MobileProfile from "@/ui/MobileProfile";
 
 const ChatList = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
   const [mounted, setMounted] = useState(false);
+  const [isDark, setIsDark] = useState(false);
   const { rooms, fetchRooms } = useStore((s) => s);
   const lottieRef = useRef<LottieRefCurrentProps>(null);
-  const router = useRouter();
-  const chatId = rooms.map((el) => el.id);
+  const [modal, setModal] = useState(false);
 
   const handleMenu = () => {
+    if (modal) {
+      lottieRef.current?.setDirection(-1);
+    } else {
+      lottieRef.current?.setDirection(1);
+    }
     lottieRef.current?.play();
+    setModal((prev) => !prev);
   };
 
   useEffect(() => {
     setMounted(true);
     fetchRooms();
+  }, []);
+
+  useEffect(() => {
+    setMounted(true);
+    const checkTheme = () => {
+      setIsDark(document.documentElement.classList.contains("dark"));
+    };
+
+    checkTheme();
+
+    const observer = new MutationObserver(checkTheme);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
+    return () => observer.disconnect();
   }, []);
 
   if (!mounted) return null;
@@ -56,6 +78,17 @@ const ChatList = () => {
               transition={{ duration: 0.3 }}
               className="relative h-screen w-full"
             >
+              <div onClick={handleMenu} className="w-12 h-12 cursor-pointer">
+                <Lottie
+                  key={!isDark ? "dark" : "light"}
+                  lottieRef={lottieRef}
+                  animationData={!isDark ? animationDataDark : animationData}
+                  loop={false}
+                  autoplay={false}
+                />
+              </div>
+
+              {modal && <MobileProfile modal={modal} onClose={handleMenu} />}
               <div className="pb-3 pt-4">
                 <h2 className="text-2xl font-bold mb-4 text-slate-800 dark:text-gray-200 flex items-center gap-2">
                   Messages
@@ -101,7 +134,7 @@ const ChatList = () => {
 
               <motion.button
                 onClick={() => dispatch({ type: "OPEN_GROUP" })}
-                className="cursor-pointer absolute bottom-6 right-6 flex items-center justify-center 
+                className="cursor-pointer absolute md:bottom-6 md:right-6 bottom-0 right-0 flex items-center justify-center 
              bg-linear-to-tr from-purple-600 to-blue-500 
              hover:from-purple-700 hover:to-blue-600 
              text-white p-4 rounded-2xl shadow-lg shadow-purple-500/30 

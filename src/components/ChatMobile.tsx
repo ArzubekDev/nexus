@@ -52,13 +52,15 @@ const ChatMobile = ({ dispatch, chatId }: ChatMobileProps) => {
               }`}
             >
               <div
-                className={`p-3 text-sm rounded-2xl ${
+                className={`p-4 rounded-2xl max-w-full wrap-break-word ${
                   isMe
-                    ? "bg-purple-600 text-white rounded-tr-none"
-                    : "bg-gray-200 dark:bg-[#4d38a2] dark:text-white rounded-tl-none"
+                    ? "bg-purple-600 text-white shadow-md rounded-tr-none ml-auto"
+                    : "bg-white text-slate-700 border border-slate-100 shadow-sm dark:bg-[#4d38a2] dark:text-white rounded-tl-none mr-auto"
                 }`}
               >
-                {msg.text}
+                <p className="text-sm leading-relaxed whitespace-pre-wrap">
+                  {msg.text}
+                </p>
               </div>
             </div>
           );

@@ -78,7 +78,7 @@ const Chat = () => {
       </header>
 
       {/* Билдирүүлөр тизмеси */}
-      <div className="flex-1 overflow-y-auto p-8 space-y-8 bg-[#f8fafc] dark:bg-linear-to-b dark:from-[#1a1a2e] dark:to-[#0b0b0e] custom-scrollbar">
+      <div className="flex-1 overflow-y-auto p-4 min-[1150px]:p-8 space-y-8 bg-[#f8fafc] dark:bg-linear-to-b dark:from-[#1a1a2e] dark:to-[#0b0b0e] custom-scrollbar">
         {messages.map((msg: any) => {
           const isMe = msg.senderId === myUserId;
 
@@ -114,7 +114,7 @@ const Chat = () => {
                 </div>
 
                 <div
-                  className={`p-4 rounded-2xl max-w-[75%] md:max-w-lg w-fit wrap-break-word ${
+                  className={`p-3 rounded-2xl min-[886px]:max-w-100.5 min-[769px]:max-w-60.5 min-[1150px]:max-w-xl wrap-break-word ${
                     isMe
                       ? "bg-purple-600 text-white shadow-md rounded-tr-none ml-auto"
                       : "bg-white text-slate-700 border border-slate-100 shadow-sm dark:bg-[#4d38a2] dark:text-white rounded-tl-none mr-auto"

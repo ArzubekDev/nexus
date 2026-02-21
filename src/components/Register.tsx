@@ -12,7 +12,7 @@ const Register = () => {
   const passwordRef = useRef<HTMLInputElement>(null);
   const confirmRef = useRef<HTMLInputElement>(null);
 
-  const { registerUser, isRegistering, registerError, error } = useStore();
+  const { registerUser, isRegistering, registerError, error, fetchRooms } = useStore();
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -31,6 +31,7 @@ const Register = () => {
 
     if (result.success) {
       toast.success("Успешно!");
+      await fetchRooms();
       router.replace("/");
     } else {
       toast.error(error || "Неверные учетные данные!");

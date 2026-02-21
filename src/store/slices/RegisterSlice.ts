@@ -42,7 +42,7 @@ registerUser: async (data) => {
 
     set({
       isRegistering: false,
-      user: res.data.user, // ← МААНИЛҮҮ
+      user: res.data.user,
       registerSuccess: true,
     });
 

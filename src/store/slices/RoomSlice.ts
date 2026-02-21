@@ -1,6 +1,7 @@
 import axios from "axios";
 import { StateCreator } from "zustand";
 import Cookies from "js-cookie";
+import api from "@/lib/api";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -54,16 +55,12 @@ export const createRoomSlice: StateCreator<RoomSlice> = (set) => ({
     }
   },
 
-  fetchRooms: async () => {
-    const token = Cookies.get("auth_token");
-  console.log("Жөнөтүлүп жаткан токен:", token); 
+fetchRooms: async () => {
     try {
-      const res = await axios.get(`${API_URL}/rooms`, {
-        headers: { Authorization: `Bearer ${Cookies.get("auth_token")}` },
-      });
+      const res = await api.get("/rooms"); 
       set({ rooms: res.data });
     } catch (error) {
-      console.error("Бөлмөлөрдү жүктөөдө ката:", error);
+      console.error("Rooms катасы:", error);
     }
   },
 

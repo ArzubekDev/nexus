@@ -45,7 +45,7 @@ export const createMessageSlice: StateCreator<MessageSlice> = (set, get) => ({
 
     const token = Cookies.get("auth_token");
 
-    const socket = io("http://localhost:4000", {
+    const socket = io(API_URL, {
       auth: {
         token: token,
       },

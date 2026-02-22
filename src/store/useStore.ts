@@ -5,7 +5,6 @@ import { createLoginSlice, LoginSlice } from "./slices/LoginSlice";
 import { createRoomSlice, RoomSlice } from "./slices/RoomSlice";
 import { createMessageSlice, MessageSlice } from "./slices/MessageSlice";
 
-
 type CombinedState = RegisterSlice & LoginSlice & RoomSlice & MessageSlice;
 
 export const useStore = create<CombinedState>()(
@@ -18,11 +17,24 @@ export const useStore = create<CombinedState>()(
         ...createMessageSlice(...a), 
       }),
       {
-        name: 'nexus-storage',
+        name: 'user-storage',
         storage: createJSONStorage(() => localStorage),
+        
         partialize: (state) => ({
-          user: (state as any).user,
+          user: state.user,
+          rooms: state.rooms,
         }),
+
+        onRehydrateStorage: (state) => {
+          console.log("Маалыматтарды калыбына келтирүү башталды...");
+          return (state, error) => {
+            if (error) {
+              console.error("Калыбына келтирүүдө ката кетти:", error);
+            } else {
+              console.log("LocalStorage ийгиликтүү жүктөлдү ✅");
+            }
+          };
+        },
       }
     )
   )

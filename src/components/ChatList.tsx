@@ -78,7 +78,7 @@ const ChatList = () => {
               transition={{ duration: 0.3 }}
               className="relative h-screen w-full"
             >
-              <div onClick={handleMenu} className="w-12 h-12 cursor-pointer">
+              <div onClick={handleMenu} className="w-12 h-12 cursor-pointer flex md:hidden">
                 <Lottie
                   key={!isDark ? "dark" : "light"}
                   lottieRef={lottieRef}

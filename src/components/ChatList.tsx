@@ -53,7 +53,7 @@ const ChatList = () => {
     return () => observer.disconnect();
   }, []);
 
-  if (!mounted) return null;
+ if (!mounted) return <div className="skeleton-sidebar" />; 
   return (
     <>
       {state.chat && state.activeChatId ? (

@@ -1,6 +1,6 @@
-import axios from "axios";
 import { StateCreator } from "zustand";
 import Cookies from "js-cookie";
+import api from "@/lib/api";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
 
@@ -29,7 +29,7 @@ export const createLoginSlice: StateCreator<LoginSlice, [], [], LoginSlice> = (
   loginUser: async (userData) => {
     set({ isLoading: true, error: null });
     try {
-      const res = await axios.post(`${API_URL}/login`, userData);
+      const res = await api.post(`${API_URL}/login`, userData);
       Cookies.set("auth_token", res.data.accessToken, { expires: 7 });
       set({ user: res.data.user, isLoading: false });
 

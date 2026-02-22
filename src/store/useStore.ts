@@ -5,7 +5,7 @@ import { createLoginSlice, LoginSlice } from "./slices/LoginSlice";
 import { createRoomSlice, RoomSlice } from "./slices/RoomSlice";
 import { createMessageSlice, MessageSlice } from "./slices/MessageSlice";
 
-type CombinedState = RegisterSlice & LoginSlice & RoomSlice & MessageSlice;
+export type CombinedState = RegisterSlice & LoginSlice & RoomSlice & MessageSlice;
 
 export const useStore = create<CombinedState>()(
   devtools(

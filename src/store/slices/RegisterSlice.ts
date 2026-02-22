@@ -3,8 +3,6 @@ import Cookies from "js-cookie";
 import api from "@/lib/api";
 import { CombinedState } from "../useStore";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
-
 interface UserData {
   id?: string;
   avatarUrl?: string;

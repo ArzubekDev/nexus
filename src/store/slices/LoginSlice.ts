@@ -1,8 +1,7 @@
 import { StateCreator } from "zustand";
 import Cookies from "js-cookie";
 import api from "@/lib/api";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+import { CombinedState } from "../useStore"; 
 
 interface UserData {
   id?: string;
@@ -19,8 +18,9 @@ export interface LoginSlice {
   logout: () => void;
 }
 
-export const createLoginSlice: StateCreator<LoginSlice, [], [], LoginSlice> = (
+export const createLoginSlice: StateCreator<CombinedState, [], [], LoginSlice> = (
   set,
+  get 
 ) => ({
   user: null,
   isLoading: false,
@@ -29,9 +29,14 @@ export const createLoginSlice: StateCreator<LoginSlice, [], [], LoginSlice> = (
   loginUser: async (userData) => {
     set({ isLoading: true, error: null });
     try {
-      const res = await api.post(`${API_URL}/login`, userData);
+      const res = await api.post(`/login`, userData);
       Cookies.set("auth_token", res.data.accessToken, { expires: 7 });
+      
       set({ user: res.data.user, isLoading: false });
+      
+      if ("fetchRooms" in get()) {
+        (get() as any).fetchRooms();
+      }
 
       return { success: true };
     } catch (error: any) {
@@ -45,6 +50,10 @@ export const createLoginSlice: StateCreator<LoginSlice, [], [], LoginSlice> = (
 
   logout: () => {
     Cookies.remove("auth_token");
-    set({ user: null });
+    set({ 
+      user: null, 
+      rooms: [], 
+      messages: [] 
+    } as Partial<CombinedState>); 
   },
 });

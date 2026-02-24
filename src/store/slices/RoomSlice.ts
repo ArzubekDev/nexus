@@ -5,7 +5,7 @@ import api from "@/lib/api";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-interface RoomProps {
+export interface RoomProps {
   id?: string;
   name: string;
   isGroup: boolean;
@@ -29,31 +29,26 @@ export const createRoomSlice: StateCreator<RoomSlice> = (set) => ({
   isLoading: false,
   error: null,
 
-  createRoom: async (room) => {
-    set({ isLoading: true, error: null });
+createRoom: async (room) => {
+  set({ isLoading: true, error: null });
+  try {
+    const res = await axios.post(`${API_URL}/rooms`, room, {
+      headers: {
+        Authorization: `Bearer ${Cookies.get("auth_token")}`,
+      },
+    });
 
-    try {
-      const res = await axios.post(`${API_URL}/rooms`, room, {
-        headers: {
-          Authorization: `Bearer ${Cookies.get("auth_token")}`,
-        },
-      });
+    set({ isLoading: false }); 
 
-      set((state) => ({
-        rooms: [...state.rooms, res.data],
-        isLoading: false,
-      }));
-
-      return { success: true };
-    } catch (error: any) {
-      set({
-        error: error.response?.data?.message || "Ката кетти",
-        isLoading: false,
-      });
-
-      return { success: false };
-    }
-  },
+    return { success: true };
+  } catch (error: any) {
+    set({
+      error: error.response?.data?.message || "Ката кетти",
+      isLoading: false,
+    });
+    return { success: false };
+  }
+},
 
 fetchRooms: async () => {
     try {

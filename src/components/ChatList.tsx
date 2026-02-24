@@ -15,7 +15,7 @@ const ChatList = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
   const [mounted, setMounted] = useState(false);
   const [isDark, setIsDark] = useState(false);
-  const { rooms, fetchRooms } = useStore((s) => s);
+  const { rooms, fetchRooms, connectSocket } = useStore((s) => s);
   const lottieRef = useRef<LottieRefCurrentProps>(null);
   const [modal, setModal] = useState(false);
 
@@ -32,6 +32,7 @@ const ChatList = () => {
   useEffect(() => {
     setMounted(true);
     fetchRooms();
+    connectSocket("");
   }, []);
 
   useEffect(() => {

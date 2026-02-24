@@ -2,6 +2,8 @@ import { StateCreator } from "zustand";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { io, Socket } from "socket.io-client";
+import { RoomProps } from "./RoomSlice";
+import { CombinedState } from "../useStore";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -25,7 +27,12 @@ export interface MessageSlice {
   emitStopTyping: (roomId: string, userId: string) => void;
 }
 
-export const createMessageSlice: StateCreator<MessageSlice> = (set, get) => ({
+export const createMessageSlice: StateCreator<
+  CombinedState,    
+  [], 
+  [], 
+  MessageSlice      
+> = (set, get) => ({
   messages: [],
   socket: null,
   typingUsers: [],
@@ -86,6 +93,21 @@ export const createMessageSlice: StateCreator<MessageSlice> = (set, get) => ({
     });
 
     socket.on("disconnect", () => console.log("Сокет үзүлдү ❌"));
+    // MessageSlice.ts ичиндеги connectSocket функциясынын ичине:
+
+socket.on("room-created", (newRoom: RoomProps) => {
+  set((state: any) => {
+    const exists = state.rooms?.some((r: any) => r.id === newRoom.id);
+    if (exists) return state;
+    return { rooms: [newRoom, ...(state.rooms || [])] };
+  });
+});
+
+socket.on("room-deleted", (roomId: string) => {
+  set((state: any) => ({
+    rooms: state.rooms?.filter((r: any) => r.id !== roomId) || [],
+  }));
+});
 
     set({ socket });
   },

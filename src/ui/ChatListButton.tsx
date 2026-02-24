@@ -16,7 +16,7 @@ const ChatListButton = ({ el }: ChatListButtonProps) => {
         router.push(`/${el.id}`);
       }}
       key={el.id}
-      className={`md:flex w-full cursor-pointer hidden items-center gap-3 p-3 rounded-2xl bg-transparent hover:bg-slate-50 dark:hover:bg-[#1a1a20] border-transparent border`}
+      className={` w-full cursor-pointer items-center gap-3 p-3 rounded-2xl bg-transparent hover:bg-slate-50 dark:hover:bg-[#1a1a20] border-transparent border`}
     >
       <div className="relative">
         <img

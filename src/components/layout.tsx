@@ -7,7 +7,7 @@ interface LayoutProps {
 
 const Layout: FC<LayoutProps> = ({ children }) => {
   return <>
-    <ChatList/>
+    {/* <ChatList/> */}
     {children}
   </>
 }

@@ -6,6 +6,8 @@ export const useChat = (chatId: string) => {
   const [text, setText] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [isTextEmpty, setIsTextEmpty] = useState(true);
+const typingTimeout = useRef<NodeJS.Timeout | null>(null);
 
   const {
     messages,
@@ -14,9 +16,38 @@ export const useChat = (chatId: string) => {
     connectSocket,
     sendMessage,
     disconnectSocket,
+    typingUsers,
+    emitTyping,
+    emitStopTyping,
   } = useStore((s) => s);
 
   const myUserId = user?.id;
+
+const handleInput = () => {
+  const textarea = textareaRef.current;
+  if (!textarea || !myUserId) return;
+
+  textarea.style.height = "auto";
+  textarea.style.height = `${textarea.scrollHeight}px`;
+
+  const value = textarea.value;
+  const empty = value.trim().length === 0;
+
+  if (empty !== isTextEmpty) {
+    setIsTextEmpty(empty);
+  }
+
+  // 🔥 typing emit
+  emitTyping(chatId, myUserId);
+
+  if (typingTimeout.current) {
+    clearTimeout(typingTimeout.current);
+  }
+
+  typingTimeout.current = setTimeout(() => {
+    emitStopTyping(chatId, myUserId);
+  }, 1500);
+};
 
   useEffect(() => {
     if (!chatId) return;
@@ -43,19 +74,32 @@ export const useChat = (chatId: string) => {
 
   const handleSendMessage = (e?: React.FormEvent) => {
     e?.preventDefault();
-    if (!text.trim() || !myUserId) return;
+    const messageValue = textareaRef.current?.value.trim();
 
-    sendMessage(chatId, text, myUserId);
-    setText("");
+    if (!messageValue || !myUserId) return;
+
+    sendMessage(chatId, messageValue, myUserId);
+
+    emitStopTyping(chatId, myUserId);
+
+    if (textareaRef.current) {
+      textareaRef.current.value = "";
+      textareaRef.current.style.height = "auto";
+      setIsTextEmpty(true);
+      textareaRef.current.focus();
+    }
   };
 
-  return {
-    text,
-    setText,
-    textareaRef,
-    messagesEndRef,
-    messages,
-    myUserId,
-    handleSendMessage,
-  };
+return {
+  text,
+  setText,
+  isTextEmpty,
+  handleInput,
+  textareaRef,
+  messagesEndRef,
+  messages,
+  myUserId,
+  handleSendMessage,
+  typingUsers, 
+};
 };

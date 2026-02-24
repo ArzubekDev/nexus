@@ -16,15 +16,19 @@ export interface MessageProps {
 export interface MessageSlice {
   messages: MessageProps[];
   socket: Socket | null;
+  typingUsers: string[];
   fetchMessages: (roomId: string) => Promise<void>;
   connectSocket: (roomId: string) => void;
   sendMessage: (roomId: string, content: string, userId: string) => void;
   disconnectSocket: () => void;
+  emitTyping: (roomId: string, userId: string) => void;
+  emitStopTyping: (roomId: string, userId: string) => void;
 }
 
 export const createMessageSlice: StateCreator<MessageSlice> = (set, get) => ({
   messages: [],
   socket: null,
+  typingUsers: [],
 
   fetchMessages: async (roomId) => {
     try {
@@ -45,7 +49,7 @@ export const createMessageSlice: StateCreator<MessageSlice> = (set, get) => ({
     const token = Cookies.get("auth_token");
 
     const socket = io(API_URL!, {
-      transports: ["websocket"], 
+      transports: ["websocket"],
       auth: { token },
       reconnectionAttempts: 5,
     });
@@ -55,7 +59,7 @@ export const createMessageSlice: StateCreator<MessageSlice> = (set, get) => ({
       socket.emit("join-room", roomId);
     });
 
-    socket.off("new-message"); 
+    socket.off("new-message");
     socket.on("new-message", (message: MessageProps) => {
       set((state) => {
         const exists = state.messages.some((m) => m.id === message.id);
@@ -78,8 +82,16 @@ export const createMessageSlice: StateCreator<MessageSlice> = (set, get) => ({
     }
   },
 
+  emitTyping: (roomId, userId) => {
+    get().socket?.emit("typing", { roomId, userId });
+  },
+
+  emitStopTyping: (roomId, userId) => {
+    get().socket?.emit("stop-typing", { roomId, userId });
+  },
+
   disconnectSocket: () => {
     get().socket?.disconnect();
-    set({ socket: null });
+    set({ socket: null, typingUsers: [] });
   },
 });

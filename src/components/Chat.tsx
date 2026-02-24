@@ -9,29 +9,29 @@ import {
   Paperclip,
   Mic,
   Send,
+  Backpack,
+  MoveLeft,
 } from "lucide-react";
 import { ChatProvider } from "@/providers/ChatProvider";
 import ChatSettings from "@/ui/ChatSettings";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useChat } from "@/modules/useChat";
 
 const Chat = () => {
-  // 1. useParams аркылуу chatId алуу
   const { chatId } = useParams() as { chatId: string };
-
-  // 2. Бардык логиканы бир эле жерден (хуктан) алуу
+  const router = useRouter();
   const {
-    text,
-    setText,
     textareaRef,
     messagesEndRef,
     messages,
     myUserId,
     handleSendMessage,
+    handleInput,
+    isTextEmpty,
   } = useChat(chatId);
+  console.log(messages, "messages sender");
 
-  // 3. Бөлмөлөр тизмесинен учурдагы чатты табуу
-  const rooms = useStore((s) => s.rooms);
+  const { rooms, typingUsers, emitTyping, emitStopTyping } = useStore((s) => s);
   const currentChat = rooms.find((room) => room.id === chatId);
 
   if (!currentChat)
@@ -40,10 +40,13 @@ const Chat = () => {
   return (
     <section className="z-50 flex-1 h-screen flex flex-col bg-white dark:bg-[#0b0b0e] text-slate-900 dark:text-white overflow-hidden transition-colors duration-300">
       <header
-        className="relative h-24 flex items-center justify-between px-8 
+        className="relative h-24 flex items-center justify-between md:px-8 px-3
         bg-white border-b border-slate-100 
         dark:bg-linear-to-r dark:from-[#1a1a2e] dark:via-[#3b1c71] dark:to-[#1a1a2e] dark:border-none shadow-sm"
       >
+        <div className="md:hidden block" onClick={() => router.back()}>
+          <MoveLeft />
+        </div>
         <div className="flex items-center gap-4">
           <div className="relative">
             <img
@@ -51,7 +54,6 @@ const Chat = () => {
               className="w-12 h-12 rounded-full object-cover border-2 border-purple-100 dark:border-purple-400 shadow-sm"
               alt="avatar"
             />
-            <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white dark:border-[#1a1a2e] rounded-full"></span>
           </div>
           <div>
             <h3 className="text-xl font-bold tracking-tight dark:tracking-wide">
@@ -66,7 +68,7 @@ const Chat = () => {
         <div className="relative flex items-center gap-5 text-slate-400 dark:text-gray-300">
           <Phone className="w-5 h-5 cursor-pointer hover:text-purple-600 dark:hover:text-white transition" />
           <Video className="w-5 h-5 cursor-pointer hover:text-purple-600 dark:hover:text-white transition" />
-          <Search className="w-5 h-5 cursor-pointer hover:text-purple-600 dark:hover:text-white transition" />
+          <Search className="w-5 h-5 cursor-pointer hover:text-purple-600 dark:hover:text-white transition md:block hidden" />
 
           <ChatProvider>
             <ChatProvider.Open>
@@ -77,11 +79,9 @@ const Chat = () => {
         </div>
       </header>
 
-      {/* Билдирүүлөр тизмеси */}
       <div className="flex-1 overflow-y-auto p-4 min-[1150px]:p-8 space-y-8 bg-[#f8fafc] dark:bg-linear-to-b dark:from-[#1a1a2e] dark:to-[#0b0b0e] custom-scrollbar">
         {messages.map((msg: any) => {
           const isMe = msg.senderId === myUserId;
-
           return (
             <div
               key={msg.id}
@@ -103,7 +103,9 @@ const Chat = () => {
                   <span
                     className={`text-sm font-bold ${isMe ? "text-purple-600 dark:text-purple-400" : "text-slate-700 dark:text-white"}`}
                   >
-                    {isMe ? "You" : "User"}
+                    {isMe
+                      ? "You"
+                      : msg.sender?.email?.split("@")[0] || "Unknown"}
                   </span>
                   <span className="text-[10px] text-slate-400 dark:text-gray-500">
                     {new Date(msg.createdAt).toLocaleTimeString([], {
@@ -114,7 +116,7 @@ const Chat = () => {
                 </div>
 
                 <div
-                  className={`p-3 rounded-2xl min-[886px]:max-w-100.5 min-[769px]:max-w-60.5 min-[1150px]:max-w-xl wrap-break-word ${
+                  className={`flex items-center justify-center p-3 rounded-2xl min-[886px]:max-w-100.5 min-[769px]:max-w-60.5 min-[1150px]:max-w-xl wrap-break-word ${
                     isMe
                       ? "bg-purple-600 text-white shadow-md rounded-tr-none ml-auto"
                       : "bg-white text-slate-700 border border-slate-100 shadow-sm dark:bg-[#4d38a2] dark:text-white rounded-tl-none mr-auto"
@@ -128,10 +130,20 @@ const Chat = () => {
             </div>
           );
         })}
+        {typingUsers
+          ?.filter((id) => id !== myUserId)
+          .map((id) => (
+            <div key={id} className="flex items-center gap-3 px-2">
+              <div className="w-8 h-8 rounded-full bg-gray-300" />
+              <div className="bg-white dark:bg-[#4d38a2] px-4 py-2 rounded-2xl rounded-tl-none shadow text-sm text-gray-500 italic">
+                typing...
+              </div>
+            </div>
+          ))}
         <div ref={messagesEndRef} />
       </div>
 
-      <footer className="p-6 bg-white dark:bg-[#0b0b0e] border-t border-slate-100">
+      <footer className="p-6 bg-white dark:bg-[#0b0b0e] border-t border-slate-100/30">
         <form
           onSubmit={handleSendMessage}
           className="max-w-4xl mx-auto flex items-end gap-4 bg-slate-50 dark:bg-[#1a1a20] p-2 rounded-2xl border border-slate-200 dark:border-white/5"
@@ -142,11 +154,10 @@ const Chat = () => {
 
           <textarea
             ref={textareaRef}
-            value={text}
-            onChange={(e) => setText(e.target.value)}
+            onChange={handleInput}
             rows={1}
             placeholder="Your Message..."
-            className="flex-1 bg-transparent resize-none border-none outline-none text-sm py-2 px-2 text-slate-700 dark:text-white"
+            className="flex-1 bg-transparent resize-none py-3 border-none outline-none max-h-32 overflow-y-auto text-sm text-slate-700 dark:text-white"
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.shiftKey) {
                 e.preventDefault();
@@ -155,7 +166,7 @@ const Chat = () => {
             }}
           />
 
-          {text.trim() ? (
+          {!isTextEmpty ? (
             <button
               type="submit"
               className="p-3 bg-purple-600 rounded-xl text-white"

@@ -32,7 +32,6 @@ const ChatList = () => {
   useEffect(() => {
     setMounted(true);
     fetchRooms();
-    connectSocket("");
   }, []);
 
   useEffect(() => {

@@ -20,7 +20,8 @@ export interface MessageSlice {
   socket: Socket | null;
   typingUsers: string[];
   fetchMessages: (roomId: string) => Promise<void>;
-  connectSocket: (roomId: string) => void;
+  connectSocket: () => void;
+  joinRoom: (roomId: string) => void;
   sendMessage: (roomId: string, content: string, userId: string) => void;
   disconnectSocket: () => void;
   emitTyping: (roomId: string, userId: string) => void;
@@ -28,10 +29,10 @@ export interface MessageSlice {
 }
 
 export const createMessageSlice: StateCreator<
-  CombinedState,    
-  [], 
-  [], 
-  MessageSlice      
+  CombinedState,
+  [],
+  [],
+  MessageSlice
 > = (set, get) => ({
   messages: [],
   socket: null,
@@ -48,69 +49,121 @@ export const createMessageSlice: StateCreator<
     }
   },
 
-  connectSocket: (roomId) => {
-    if (get().socket) {
-      get().socket?.disconnect();
-    }
+  //   connectSocket: (roomId) => {
+  //     if (get().socket) {
+  //       get().socket?.disconnect();
+  //     }
+
+  //     const token = Cookies.get("auth_token");
+
+  //     const socket = io(API_URL!, {
+  //       transports: ["websocket"],
+  //       auth: { token },
+  //       reconnectionAttempts: 5,
+  //     });
+
+  //     socket.off("user-typing");
+  //     socket.off("user-stop-typing");
+
+  //     socket.on("user-typing", ({ userId }: { userId: string }) => {
+  //       set((state) => {
+  //         if (!state.typingUsers.includes(userId)) {
+  //           return { typingUsers: [...state.typingUsers, userId] };
+  //         }
+  //         return state;
+  //       });
+  //     });
+
+  //     socket.on("user-stop-typing", ({ userId }: { userId: string }) => {
+  //       set((state) => ({
+  //         typingUsers: state.typingUsers.filter((id) => id !== userId),
+  //       }));
+  //     });
+  //     socket.on("connect", () => {
+  //       console.log("Сокетке туташты ✅");
+  //       socket.emit("join-room", roomId);
+  //     });
+
+  //     socket.off("new-message");
+  //     socket.on("new-message", (message: MessageProps) => {
+  //       set((state) => {
+  //         const exists = state.messages.some((m) => m.id === message.id);
+  //         if (exists) return state;
+  //         return { messages: [...state.messages, message] };
+  //       });
+  //     });
+
+  //     socket.on("disconnect", () => console.log("Сокет үзүлдү ❌"));
+  //     // MessageSlice.ts ичиндеги connectSocket функциясынын ичине:
+
+  // socket.on("room-created", (newRoom: RoomProps) => {
+  //   set((state: any) => {
+  //     const exists = state.rooms?.some((r: any) => r.id === newRoom.id);
+  //     if (exists) return state;
+  //     return { rooms: [newRoom, ...(state.rooms || [])] };
+  //   });
+  // });
+
+  // socket.on("room-deleted", (roomId: string) => {
+  //   set((state: any) => ({
+  //     rooms: state.rooms?.filter((r: any) => r.id !== roomId) || [],
+  //   }));
+  // });
+
+  //     set({ socket });
+  //   },
+
+  connectSocket: () => {
+    if (get().socket) return;
 
     const token = Cookies.get("auth_token");
 
     const socket = io(API_URL!, {
       transports: ["websocket"],
       auth: { token },
-      reconnectionAttempts: 5,
     });
 
-    socket.off("user-typing");
-    socket.off("user-stop-typing");
-
-    socket.on("user-typing", ({ userId }: { userId: string }) => {
-      set((state) => {
-        if (!state.typingUsers.includes(userId)) {
-          return { typingUsers: [...state.typingUsers, userId] };
-        }
-        return state;
-      });
-    });
-
-    socket.on("user-stop-typing", ({ userId }: { userId: string }) => {
-      set((state) => ({
-        typingUsers: state.typingUsers.filter((id) => id !== userId),
-      }));
-    });
     socket.on("connect", () => {
-      console.log("Сокетке туташты ✅");
-      socket.emit("join-room", roomId);
+      console.log("Socket connected");
     });
 
-    socket.off("new-message");
     socket.on("new-message", (message: MessageProps) => {
-      set((state) => {
-        const exists = state.messages.some((m) => m.id === message.id);
-        if (exists) return state;
-        return { messages: [...state.messages, message] };
-      });
-    });
-
-    socket.on("disconnect", () => console.log("Сокет үзүлдү ❌"));
-    // MessageSlice.ts ичиндеги connectSocket функциясынын ичине:
-
-socket.on("room-created", (newRoom: RoomProps) => {
-  set((state: any) => {
-    const exists = state.rooms?.some((r: any) => r.id === newRoom.id);
+  set((state) => {
+    const exists = state.messages.some((m) => m.id === message.id);
     if (exists) return state;
-    return { rooms: [newRoom, ...(state.rooms || [])] };
+    return { messages: [...state.messages, message] };
   });
 });
 
-socket.on("room-deleted", (roomId: string) => {
-  set((state: any) => ({
-    rooms: state.rooms?.filter((r: any) => r.id !== roomId) || [],
-  }));
-});
+    socket.on("room-created", (newRoom) => {
+      set((state: any) => {
+        const exists = state.rooms?.some((r: any) => r.id === newRoom.id);
+        if (exists) return state;
+        return { rooms: [newRoom, ...(state.rooms || [])] };
+      });
+    });
+
+    socket.on("room-deleted", (roomId: string) => {
+      set((state: any) => ({
+        rooms: state.rooms.filter((r: any) => r.id !== roomId),
+      }));
+    });
 
     set({ socket });
   },
+
+joinRoom: (roomId: string) => {
+  const socket = get().socket;
+  if (!socket) return;
+
+  if (socket.connected) {
+    socket.emit("join-room", roomId);
+  } else {
+    socket.once("connect", () => {
+      socket.emit("join-room", roomId);
+    });
+  }
+},
 
   sendMessage: (roomId, text) => {
     const socket = get().socket;

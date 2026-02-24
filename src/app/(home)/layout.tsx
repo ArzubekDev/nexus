@@ -2,16 +2,20 @@
 "use client";
 import ChatList from "@/components/ChatList";
 import MiniSidebar from "@/components/MiniSidebar";
-import { FC, ReactNode } from "react";
-import { useParams } from "next/navigation"; // useParams кошобуз
+import { FC, ReactNode, useEffect } from "react";
+import { useParams } from "next/navigation"; 
+import { useStore } from "@/store/useStore";
 
 interface LayoutProps {
   children: ReactNode;
 }
 
 const Layout: FC<LayoutProps> = ({ children }) => {
-  const { chatId } = useParams(); // Учурда чат ачыкпы же жокпу текшеребиз
-
+  const { chatId } = useParams(); 
+  const {connectSocket} = useStore((s) => s)
+useEffect(() => {
+  connectSocket();
+}, []);
   return (
     <div className="flex h-screen w-full overflow-hidden bg-white dark:bg-[#0f0f13]">
       <div className={`${chatId ? "hidden md:flex" : "flex"}`}>

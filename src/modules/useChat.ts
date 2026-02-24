@@ -19,6 +19,7 @@ const typingTimeout = useRef<NodeJS.Timeout | null>(null);
     typingUsers,
     emitTyping,
     emitStopTyping,
+    joinRoom,
   } = useStore((s) => s);
 
   const myUserId = user?.id;
@@ -49,15 +50,13 @@ const handleInput = () => {
   }, 1500);
 };
 
+
   useEffect(() => {
     if (!chatId) return;
 
     fetchMessages(chatId);
-    connectSocket(chatId);
+    joinRoom(chatId);
 
-    return () => {
-      disconnectSocket();
-    };
   }, [chatId]);
 
   useEffect(() => {

@@ -113,44 +113,59 @@ export const createMessageSlice: StateCreator<
   //     set({ socket });
   //   },
 
-  connectSocket: () => {
-    if (get().socket) return;
+connectSocket: () => {
+  if (get().socket) return;
 
-    const token = Cookies.get("auth_token");
+  const token = Cookies.get("auth_token");
 
-    const socket = io(API_URL!, {
-      transports: ["websocket"],
-      auth: { token },
-    });
-
-    socket.on("connect", () => {
-      console.log("Socket connected");
-    });
-
-    socket.on("new-message", (message: MessageProps) => {
-  set((state) => {
-    const exists = state.messages.some((m) => m.id === message.id);
-    if (exists) return state;
-    return { messages: [...state.messages, message] };
+  const socket = io(API_URL!, {
+    transports: ["websocket"],
+    auth: { token },
   });
-});
 
-    socket.on("room-created", (newRoom) => {
-      set((state: any) => {
-        const exists = state.rooms?.some((r: any) => r.id === newRoom.id);
-        if (exists) return state;
-        return { rooms: [newRoom, ...(state.rooms || [])] };
-      });
+  socket.on("connect", () => {
+    console.log("Socket connected");
+  });
+
+  socket.on("new-message", (message: MessageProps) => {
+    set((state) => {
+      const exists = state.messages.some((m) => m.id === message.id);
+      if (exists) return state;
+      return { messages: [...state.messages, message] };
     });
+  });
 
-    socket.on("room-deleted", (roomId: string) => {
-      set((state: any) => ({
-        rooms: state.rooms.filter((r: any) => r.id !== roomId),
-      }));
+  socket.on("user-typing", ({ userId }: { userId: string }) => {
+    set((state) => {
+      if (!state.typingUsers.includes(userId)) {
+        return { typingUsers: [...state.typingUsers, userId] };
+      }
+      return state;
     });
+  });
 
-    set({ socket });
-  },
+  socket.on("user-stop-typing", ({ userId }: { userId: string }) => {
+    set((state) => ({
+      typingUsers: state.typingUsers.filter((id) => id !== userId),
+    }));
+  });
+
+  socket.on("room-created", (newRoom) => {
+    set((state: any) => {
+      const exists = state.rooms?.some((r: any) => r.id === newRoom.id);
+      if (exists) return state;
+      return { rooms: [newRoom, ...(state.rooms || [])] };
+    });
+  });
+
+  socket.on("room-deleted", (roomId: string) => {
+    set((state: any) => ({
+      rooms: state.rooms.filter((r: any) => r.id !== roomId),
+    }));
+  });
+
+  set({ socket });
+},
 
 joinRoom: (roomId: string) => {
   const socket = get().socket;

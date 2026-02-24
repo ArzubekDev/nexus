@@ -54,6 +54,23 @@ export const createMessageSlice: StateCreator<MessageSlice> = (set, get) => ({
       reconnectionAttempts: 5,
     });
 
+    socket.off("user-typing");
+    socket.off("user-stop-typing");
+
+    socket.on("user-typing", ({ userId }: { userId: string }) => {
+      set((state) => {
+        if (!state.typingUsers.includes(userId)) {
+          return { typingUsers: [...state.typingUsers, userId] };
+        }
+        return state;
+      });
+    });
+
+    socket.on("user-stop-typing", ({ userId }: { userId: string }) => {
+      set((state) => ({
+        typingUsers: state.typingUsers.filter((id) => id !== userId),
+      }));
+    });
     socket.on("connect", () => {
       console.log("Сокетке туташты ✅");
       socket.emit("join-room", roomId);

@@ -116,7 +116,7 @@ const Chat = () => {
                 </div>
 
                 <div
-                  className={`flex items-center justify-center p-3 rounded-2xl min-[886px]:max-w-100.5 min-[769px]:max-w-60.5 min-[1150px]:max-w-xl wrap-break-word ${
+                  className={` p-3 rounded-2xl min-[886px]:max-w-100.5 min-[769px]:max-w-60.5 min-[1150px]:max-w-xl wrap-break-word ${
                     isMe
                       ? "bg-purple-600 text-white shadow-md rounded-tr-none ml-auto"
                       : "bg-white text-slate-700 border border-slate-100 shadow-sm dark:bg-[#4d38a2] dark:text-white rounded-tl-none mr-auto"

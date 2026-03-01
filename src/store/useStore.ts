@@ -1,11 +1,14 @@
 import { create } from "zustand";
-import { devtools, persist, createJSONStorage } from 'zustand/middleware';
+import { devtools, persist, createJSONStorage } from "zustand/middleware";
 import { createRegisterSlice, RegisterSlice } from "./slices/RegisterSlice";
 import { createLoginSlice, LoginSlice } from "./slices/LoginSlice";
 import { createRoomSlice, RoomSlice } from "./slices/RoomSlice";
 import { createMessageSlice, MessageSlice } from "./slices/MessageSlice";
 
-export type CombinedState = RegisterSlice & LoginSlice & RoomSlice & MessageSlice;
+export type CombinedState = RegisterSlice &
+  LoginSlice &
+  RoomSlice &
+  MessageSlice;
 
 export const useStore = create<CombinedState>()(
   devtools(
@@ -14,11 +17,16 @@ export const useStore = create<CombinedState>()(
         ...createLoginSlice(...a),
         ...createRegisterSlice(...a),
         ...createRoomSlice(...a),
-        ...createMessageSlice(...a), 
+        ...createMessageSlice(...a),
       }),
       {
-        name: 'user-storage',
+        name: "user-storage",
         storage: createJSONStorage(() => localStorage),
+
+        partialize: (state) => ({
+          user: state.user,
+          rooms: state.rooms,
+        }),
 
         onRehydrateStorage: (state) => {
           console.log("Маалыматтарды калыбына келтирүү башталды...");
@@ -30,7 +38,7 @@ export const useStore = create<CombinedState>()(
             }
           };
         },
-      }
-    )
-  )
+      },
+    ),
+  ),
 );

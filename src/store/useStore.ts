@@ -19,11 +19,6 @@ export const useStore = create<CombinedState>()(
       {
         name: 'user-storage',
         storage: createJSONStorage(() => localStorage),
-        
-        partialize: (state) => ({
-          user: state.user,
-          rooms: state.rooms,
-        }),
 
         onRehydrateStorage: (state) => {
           console.log("Маалыматтарды калыбына келтирүү башталды...");

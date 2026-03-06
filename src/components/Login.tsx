@@ -12,7 +12,7 @@ const Login = () => {
   const passwordRef = useRef<HTMLInputElement>(null);
 
   const router = useRouter();
-  const { loginUser, error } = useStore();
+  const { loginUser, error, isLoading } = useStore();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -87,10 +87,12 @@ const Login = () => {
         </div>
 
         <button
-          type="submit"
-          className="cursor-pointer bg-linear-to-r from-purple-600 to-indigo-600 hover:opacity-90 transition text-white h-10 rounded-lg font-semibold"
+          disabled={isLoading}
+          className={`bg-linear-to-r from-purple-600 to-indigo-600 text-white h-10 rounded-lg font-semibold transition ${
+            isLoading ? "opacity-50 cursor-not-allowed" : "hover:opacity-90"
+          }`}
         >
-          Log In
+          {isLoading ? "Login..." : "Login"}
         </button>
         <p className="text-center text-sm text-gray-600">
           Don’t have an account?{" "}

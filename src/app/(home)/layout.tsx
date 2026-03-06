@@ -26,7 +26,7 @@ useEffect(() => {
         <ChatList />
       </div>
 
-      <main className={`flex-1 h-full overflow-hidden relative ${!chatId ? "hidden md:block" : "block"}`}>
+      <main className={`flex-1 h-full md:w-full overflow-hidden relative ${!chatId ? "hidden md:block" : "block"}`}>
         {children}
       </main>
     </div>

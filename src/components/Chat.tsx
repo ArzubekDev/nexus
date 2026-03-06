@@ -116,13 +116,13 @@ const Chat = () => {
                 </div>
 
                 <div
-                  className={` p-3 rounded-2xl min-[886px]:max-w-100.5 min-[769px]:max-w-60.5 min-[1150px]:max-w-xl wrap-break-word ${
+                  className={`w-full p-3 rounded-2xl min-[886px]:max-w-100.5 min-[767px]:max-w-60.5 max-[766px]:max-w-70.5 max-[512px]:max-w-60.5 min-[1150px]:max-w-xl wrap-break-word ${
                     isMe
                       ? "bg-purple-600 text-white shadow-md rounded-tr-none ml-auto"
                       : "bg-white text-slate-700 border border-slate-100 shadow-sm dark:bg-[#4d38a2] dark:text-white rounded-tl-none mr-auto"
                   }`}
                 >
-                  <p className="text-sm leading-relaxed whitespace-pre-wrap">
+                  <p className="text-sm leading-relaxed whitespace-pre-wrap w-full">
                     {msg.text}
                   </p>
                 </div>
@@ -143,7 +143,7 @@ const Chat = () => {
         <div ref={messagesEndRef} />
       </div>
 
-      <footer className="p-6 bg-white dark:bg-[#0b0b0e] border-t border-slate-100/30">
+      <footer className="p-2 bg-white dark:bg-[#0b0b0e] border-t border-slate-100/30 md:p-6">
         <form
           onSubmit={handleSendMessage}
           className="max-w-4xl mx-auto flex items-end gap-4 bg-slate-50 dark:bg-[#1a1a20] p-2 rounded-2xl border border-slate-200 dark:border-white/5"

@@ -1,14 +1,15 @@
-import { StateCreator } from "zustand";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { io, Socket } from "socket.io-client";
-import { RoomProps } from "./RoomSlice";
+import { StateCreator } from "zustand";
 import { CombinedState } from "../useStore";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export interface MessageProps {
   id: string;
+  fileUrl?: string; // Кошулду
+  type: "TEXT" | "VOICE"; // Кошулду
   text: string;
   roomId: string;
   senderId: string;
@@ -19,6 +20,7 @@ export interface MessageSlice {
   messages: MessageProps[];
   socket: Socket | null;
   typingUsers: string[];
+  uploadVoice: (roomId: string, file: Blob) => Promise<void>;
   fetchMessages: (roomId: string) => Promise<void>;
   connectSocket: () => void;
   joinRoom: (roomId: string) => void;
@@ -49,6 +51,24 @@ export const createMessageSlice: StateCreator<
     }
   },
 
+  uploadVoice: async (roomId: string, file: Blob) => {
+    try {
+      const formData = new FormData();
+      formData.append("file", file, "voice_message.webm");
+      formData.append("roomId", roomId);
+  
+      await axios.post(`${API_URL}/messages/voice`, formData, {
+        headers: {
+          Authorization: `Bearer ${Cookies.get("auth_token")}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      // Socket аркылуу сервер өзү 'new-message' таратат, 
+      // ошондуктан бул жерде set({ messages: ... }) кылуунун кереги жок.
+    } catch (error) {
+      console.error("Голосовой билдирүү жөнөтүүдө ката:", error);
+    }
+  },
   //   connectSocket: (roomId) => {
   //     if (get().socket) {
   //       get().socket?.disconnect();
@@ -113,72 +133,72 @@ export const createMessageSlice: StateCreator<
   //     set({ socket });
   //   },
 
-connectSocket: () => {
-  if (get().socket) return;
+  connectSocket: () => {
+    if (get().socket) return;
 
-  const token = Cookies.get("auth_token");
+    const token = Cookies.get("auth_token");
 
-  const socket = io(API_URL!, {
-    transports: ["websocket"],
-    auth: { token },
-  });
-
-  socket.on("connect", () => {
-    console.log("Socket connected");
-  });
-
-  socket.on("new-message", (message: MessageProps) => {
-    set((state) => {
-      const exists = state.messages.some((m) => m.id === message.id);
-      if (exists) return state;
-      return { messages: [...state.messages, message] };
+    const socket = io(API_URL!, {
+      transports: ["websocket"],
+      auth: { token },
     });
-  });
 
-  socket.on("user-typing", ({ userId }: { userId: string }) => {
-    set((state) => {
-      if (!state.typingUsers.includes(userId)) {
-        return { typingUsers: [...state.typingUsers, userId] };
-      }
-      return state;
+    socket.on("connect", () => {
+      console.log("Socket connected");
     });
-  });
 
-  socket.on("user-stop-typing", ({ userId }: { userId: string }) => {
-    set((state) => ({
-      typingUsers: state.typingUsers.filter((id) => id !== userId),
-    }));
-  });
-
-  socket.on("room-created", (newRoom) => {
-    set((state: any) => {
-      const exists = state.rooms?.some((r: any) => r.id === newRoom.id);
-      if (exists) return state;
-      return { rooms: [newRoom, ...(state.rooms || [])] };
+    socket.on("new-message", (message: MessageProps) => {
+      set((state) => {
+        const exists = state.messages.some((m) => m.id === message.id);
+        if (exists) return state;
+        return { messages: [...state.messages, message] };
+      });
     });
-  });
 
-  socket.on("room-deleted", (roomId: string) => {
-    set((state: any) => ({
-      rooms: state.rooms.filter((r: any) => r.id !== roomId),
-    }));
-  });
+    socket.on("user-typing", ({ userId }: { userId: string }) => {
+      set((state) => {
+        if (!state.typingUsers.includes(userId)) {
+          return { typingUsers: [...state.typingUsers, userId] };
+        }
+        return state;
+      });
+    });
 
-  set({ socket });
-},
+    socket.on("user-stop-typing", ({ userId }: { userId: string }) => {
+      set((state) => ({
+        typingUsers: state.typingUsers.filter((id) => id !== userId),
+      }));
+    });
 
-joinRoom: (roomId: string) => {
-  const socket = get().socket;
-  if (!socket) return;
+    socket.on("room-created", (newRoom) => {
+      set((state: any) => {
+        const exists = state.rooms?.some((r: any) => r.id === newRoom.id);
+        if (exists) return state;
+        return { rooms: [newRoom, ...(state.rooms || [])] };
+      });
+    });
 
-  if (socket.connected) {
-    socket.emit("join-room", roomId);
-  } else {
-    socket.once("connect", () => {
+    socket.on("room-deleted", (roomId: string) => {
+      set((state: any) => ({
+        rooms: state.rooms.filter((r: any) => r.id !== roomId),
+      }));
+    });
+
+    set({ socket });
+  },
+
+  joinRoom: (roomId: string) => {
+    const socket = get().socket;
+    if (!socket) return;
+
+    if (socket.connected) {
       socket.emit("join-room", roomId);
-    });
-  }
-},
+    } else {
+      socket.once("connect", () => {
+        socket.emit("join-room", roomId);
+      });
+    }
+  },
 
   sendMessage: (roomId, text) => {
     const socket = get().socket;

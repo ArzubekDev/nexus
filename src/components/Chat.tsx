@@ -1,21 +1,19 @@
 "use client";
-import React from "react";
-import { useStore } from "@/store/useStore";
-import {
-  Phone,
-  Video,
-  Search,
-  Settings,
-  Paperclip,
-  Mic,
-  Send,
-  Backpack,
-  MoveLeft,
-} from "lucide-react";
-import { ChatProvider } from "@/providers/ChatProvider";
-import ChatSettings from "@/ui/ChatSettings";
-import { useParams, useRouter } from "next/navigation";
 import { useChat } from "@/modules/useChat";
+import { ChatProvider } from "@/providers/ChatProvider";
+import { useStore } from "@/store/useStore";
+import ChatSettings from "@/ui/ChatSettings";
+import {
+  Mic,
+  MoveLeft,
+  Paperclip,
+  Phone,
+  Search,
+  Send,
+  Settings,
+  Video
+} from "lucide-react";
+import { useParams, useRouter } from "next/navigation";
 
 const Chat = () => {
   const { chatId } = useParams() as { chatId: string };
@@ -28,6 +26,9 @@ const Chat = () => {
     handleSendMessage,
     handleInput,
     isTextEmpty,
+    startRecording,
+    stopRecording,
+    isRecording,
   } = useChat(chatId);
   console.log(messages, "messages sender");
 
@@ -116,15 +117,16 @@ const Chat = () => {
                 </div>
 
                 <div
-                  className={`w-full p-3 rounded-2xl min-[886px]:max-w-100.5 min-[767px]:max-w-60.5 max-[766px]:max-w-70.5 max-[512px]:max-w-60.5 min-[1150px]:max-w-xl wrap-break-word ${
-                    isMe
-                      ? "bg-purple-600 text-white shadow-md rounded-tr-none ml-auto"
-                      : "bg-white text-slate-700 border border-slate-100 shadow-sm dark:bg-[#4d38a2] dark:text-white rounded-tl-none mr-auto"
-                  }`}
+                  className={`w-full p-3 rounded-2xl min-[886px]:max-w-100.5 min-[767px]:max-w-60.5 max-[766px]:max-w-70.5 max-[512px]:max-w-60.5 min-[1150px]:max-w-xl wrap-break-word ${isMe
+                    ? "bg-purple-600 text-white shadow-md rounded-tr-none ml-auto"
+                    : "bg-white text-slate-700 border border-slate-100 shadow-sm dark:bg-[#4d38a2] dark:text-white rounded-tl-none mr-auto"
+                    }`}
                 >
+
                   <p className="text-sm leading-relaxed whitespace-pre-wrap w-full">
                     {msg.text}
                   </p>
+
                 </div>
               </div>
             </div>
@@ -139,6 +141,7 @@ const Chat = () => {
                 typing...
               </div>
             </div>
+
           ))}
         <div ref={messagesEndRef} />
       </div>
@@ -165,16 +168,14 @@ const Chat = () => {
               }
             }}
           />
-
           {!isTextEmpty ? (
-            <button
-              type="submit"
-              className="p-3 bg-purple-600 rounded-xl text-white"
-            >
+            <button type="submit" className="p-3 bg-purple-600 rounded-xl text-white">
               <Send className="w-5 h-5" />
             </button>
           ) : (
-            <button type="button" className="p-3 text-purple-600">
+            <button
+              className={`p-3 rounded-xl transition text-purple-600`}
+            >
               <Mic className="w-5 h-5" />
             </button>
           )}
